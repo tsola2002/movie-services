@@ -3,6 +3,7 @@ package io.javabrains.moviecatalogservice.resources;
 import io.javabrains.moviecatalogservice.models.CatalogItem;
 import io.javabrains.moviecatalogservice.models.Movie;
 import io.javabrains.moviecatalogservice.models.Rating;
+import io.javabrains.moviecatalogservice.models.UserRating;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,16 +25,13 @@ public class MovieCatalogResource {
   @RequestMapping("/{userId}")
   public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 
+    UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
 
 
-    //Hardcode Rating API response
-    List<Rating> ratings = Arrays.asList(
-        new Rating("Top Gun", 4),
-        new Rating("Nemesis", 3)
-    );
-
-    return ratings.stream().map(rating -> {
+    return ratings.getUserRating().stream().map(rating -> {
+          // for each movieID, call movie info service and get details
           Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
+          // Put them all together
           return new  CatalogItem(movie.getName(), "Desc", rating.getRating());
         })
         .collect(Collectors.toList());

@@ -2,6 +2,10 @@ package io.javabrains.moviecatalogservice.models;
 
 public class Rating {
 
+  public Rating() {
+
+  }
+
   private String movieId;
   private int rating;
 
